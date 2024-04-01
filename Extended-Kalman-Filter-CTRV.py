@@ -11,6 +11,7 @@ from scipy.stats import norm
 from sympy import Symbol, symbols, Matrix, sin, cos
 from sympy import init_printing
 init_printing(use_latex=True)
+from datetime import datetime
 
 
 # # Extended Kalman Filter Implementation for Constant Turn Rate and Velocity (CTRV) Vehicle Model in Python
@@ -178,9 +179,17 @@ plt.colorbar(im, cax=cax);
 #path = './../RaspberryPi-CarPC/TinkerDataLogger/DataLogs/2014/'
 datafile = '2014-03-26-000-Data.csv'
 
+def bytespdate2num(fmt):
+    def converter(b):
+        return mdates.date2num(datetime.strptime(b.decode('utf-8'), fmt))
+    return converter
+
+date_converter = bytespdate2num('%y%m%d')
+time_converter = bytespdate2num('%H%M%S%f')
+
 date, time, millis, ax, ay, az, rollrate, pitchrate, yawrate, roll, pitch, yaw, speed, course, latitude, longitude, altitude, pdop, hdop, vdop, epe, fix, satellites_view, satellites_used, temp = np.loadtxt(datafile, delimiter=',', unpack=True, 
-                  converters={1: mdates.strpdate2num('%H%M%S%f'),
-                              0: mdates.strpdate2num('%y%m%d')},
+                  converters={1: time_converter,
+                              0: date_converter},
                   skiprows=1)
 
 print('Read \'%s\' successfully.' % datafile)
